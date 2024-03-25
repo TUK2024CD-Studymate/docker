@@ -1,0 +1,6 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/TUK2024CD-Studymate/frontend.git
+[submodule "backend"]
+	path = backend
+	url = https://github.com/TUK2024CD-Studymate/backend.git
