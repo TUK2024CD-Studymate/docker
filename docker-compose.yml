@@ -1,22 +1,12 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  redis:
-    container_name: redis
-    image: redis
-    restart: always
-    ports:
-      - "6379:6379"
-    networks:
-      - study_mate
-
-  back-end:
-    env_file:
-      - .env
+  backend:
+    image: backend
+    container_name: sm_backend
     build:
-      context: .
+      context: ./backend/back-end
       dockerfile: Dockerfile
-    container_name: study-mate
     restart: always
     depends_on:
       - redis
@@ -27,7 +17,56 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - .:/app
+      - ./backend/back-end:/app
+    networks:
+      - study_mate
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - study_mate
+
+  frontend:
+    image: frontend
+    container_name: sm_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/frontend
+      - ./frontend/build:/frontend/dist
+      - /frontend/node_modules
+    tty: true
+    stdin_open: true
+    networks:
+      - study_mate
+
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - 80
+      - 443
+    volumes:
+      - ./frontend/build:/var/www/frontend
+      # - ./backend/static:/backend/static
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/certificate.pem:/etc/nginx/certificate.pem
+      - ./nginx/private.key:/etc/nginx/private.key
+    depends_on:
+      - backend
+      - frontend
     networks:
       - study_mate
 
