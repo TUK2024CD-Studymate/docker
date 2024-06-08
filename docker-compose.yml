@@ -14,6 +14,15 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      OPENAI_KEY: ${OPENAI_KEY}
+      FROMNUMBER: ${FROMNUMBER}
+      APISECRET: ${APISECRET}
+      APIKEY: ${APIKEY}
+      PFID: ${PFID}
+      TEMPLATEID: ${TEMPLATEID}
+      BUCKET: ${BUCKET}
+      ACCESSKEY: ${ACCESSKEY}
+      SECRETKEY: ${SECRETKEY}
     ports:
       - "8080:8080"
     volumes:
@@ -46,6 +55,29 @@ services:
     stdin_open: true
     networks:
       - study_mate
+
+  rabbitmq:
+    hostname: rabbit
+    image: rabbitmq:3.9-management-alpine
+    container_name: rabbitmq
+    command:
+      - bash
+      - -c
+      - |
+        rabbitmq-plugins enable rabbitmq_web_stomp && rabbitmq-plugins enable rabbitmq_web_stomp_examples && rabbitmq-server
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "61613:61613"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - study_mate
+
+
 
   nginx:
     container_name: nginx
